@@ -22,14 +22,31 @@
 # -p <port> — TCP-порт для работы (по умолчанию использует 7777);
 # -a <addr> — IP-адрес для прослушивания
 # (по умолчанию слушает все доступные адреса).
+import json
+from datetime import datetime
 from socket import SOCK_STREAM, socket
 
+
+def presence_send(sock_, account_name, status):
+    jim_msg = {
+        'action': 'presence',
+        'time': datetime.now().timestamp(),
+        'type': 'status',
+        'user': {
+            'account_name': account_name,
+            'status': status,
+        }
+    }
+    msg = json.dumps(jim_msg, sort_keys=True, separators=(',', ':'))
+    msg = msg.encode('utf-8')
+    sock_.send(msg)
+    data = sock.recv(1024)
+    print(data.decode('utf-8'))
+
+
 sock = socket(type=SOCK_STREAM)
-msg = 'Hello, world!'.encode('utf-8')
 sock.connect(('localhost', 9090))
-sock.send(msg)
 
-data = sock.recv(1024)
+presence_send(sock, 'C0deMaver1ck', 'Yep, I am here!')
+
 sock.close()
-
-print(data.decode('utf-8'))

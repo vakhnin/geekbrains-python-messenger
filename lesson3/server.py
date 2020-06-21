@@ -26,16 +26,18 @@ from socket import SOCK_STREAM, socket
 
 sock = socket(type=SOCK_STREAM)
 sock.bind(('', 9090))
-sock.listen(1)
-conn, addr = sock.accept()
+sock.listen(5)
 
-print(f'Соединение установлено: {addr}')
+while True:
+    conn, addr = sock.accept()
 
-try:
-    while True:
-        data = conn.recv(1024)
-        if not data:
-            break
-        conn.send(data.upper())
-finally:
-    conn.close()
+    print(f'Соединение установлено: {addr}')
+
+    try:
+        while True:
+            data = conn.recv(1024)
+            if not data:
+                break
+            conn.send(data.upper())
+    finally:
+        conn.close()
