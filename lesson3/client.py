@@ -38,15 +38,25 @@ def presence_send(sock_, account_name, status):
         }
     }
     msg = json.dumps(jim_msg, separators=(',', ':'))
-    # msg = '{"1:1}'
     sock_.send(msg.encode('utf-8'))
-    data = sock.recv(1024)
-    print(data.decode('utf-8'))
+    try:
+        data = sock.recv(1024)
+        jim_obj = json.loads(data.decode('utf-8'))
+        print(jim_obj)
+    except json.JSONDecodeError:
+        print('Сервер прислал не JSON')
+    finally:
+        pass
 
 
-sock = socket(type=SOCK_STREAM)
-sock.connect(('localhost', 9090))
+try:
+    sock = socket(type=SOCK_STREAM)
+    sock.connect(('localhost', 9090))
 
-presence_send(sock, 'C0deMaver1ck', 'Yep, I am here!')
-
-sock.close()
+    presence_send(sock, 'C0deMaver1ck', 'Yep, I am here!')
+except ConnectionRefusedError:
+    err_msg = 'Подключение не установлено, т.к. конечный компьютер ' + \
+            'отверг запрос на подключение'
+    print(err_msg)
+finally:
+    sock.close()

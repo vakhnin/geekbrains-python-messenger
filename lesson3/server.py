@@ -25,8 +25,6 @@
 import json
 from socket import SOCK_STREAM, socket
 
-# def
-
 sock = socket(type=SOCK_STREAM)
 sock.bind(('', 9090))
 sock.listen(5)
@@ -51,11 +49,10 @@ while True:
                     'error': 'JSON broken'
                 }
                 answer = json.dumps(jim_answer, separators=(',', ':'))
-                print(answer)
                 conn.send(answer.encode('utf-8'))
             except ConnectionResetError:
-                err_msg = 'Удаленный хост принудительно разорвал \
-                    существующее подключение'
+                err_msg = 'Удаленный хост принудительно разорвал ' + \
+                    'существующее подключение'
                 print(err_msg)
                 conn.close()
     finally:
