@@ -22,7 +22,10 @@
 # -p <port> — TCP-порт для работы (по умолчанию использует 7777);
 # -a <addr> — IP-адрес для прослушивания
 # (по умолчанию слушает все доступные адреса).
+import json
 from socket import SOCK_STREAM, socket
+
+# def
 
 sock = socket(type=SOCK_STREAM)
 sock.bind(('', 9090))
@@ -35,9 +38,25 @@ while True:
 
     try:
         while True:
-            data = conn.recv(1024)
-            if not data:
-                break
-            conn.send(data.upper())
+            try:
+                data = conn.recv(1024)
+                if not data:
+                    break
+                jim_obj = json.loads(data.decode('utf-8'))
+                print(jim_obj)
+                conn.send(data.upper())
+            except json.JSONDecodeError:
+                jim_answer = {
+                    'response': 400,
+                    'error': 'JSON broken'
+                }
+                answer = json.dumps(jim_answer, separators=(',', ':'))
+                print(answer)
+                conn.send(answer.encode('utf-8'))
+            except ConnectionResetError:
+                err_msg = 'Удаленный хост принудительно разорвал \
+                    существующее подключение'
+                print(err_msg)
+                conn.close()
     finally:
         conn.close()

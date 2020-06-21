@@ -37,9 +37,9 @@ def presence_send(sock_, account_name, status):
             'status': status,
         }
     }
-    msg = json.dumps(jim_msg, sort_keys=True, separators=(',', ':'))
-    msg = msg.encode('utf-8')
-    sock_.send(msg)
+    msg = json.dumps(jim_msg, separators=(',', ':'))
+    # msg = '{"1:1}'
+    sock_.send(msg.encode('utf-8'))
     data = sock.recv(1024)
     print(data.decode('utf-8'))
 
