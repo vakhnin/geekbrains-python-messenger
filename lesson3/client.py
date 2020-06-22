@@ -27,6 +27,17 @@ from datetime import datetime
 from socket import SOCK_STREAM, socket
 
 
+def parse_answer(jim_obj):
+    if 'response' in jim_obj.keys():
+        print(f'Server response: {jim_obj["response"]}')
+    else:
+        print('Answer has not "response" code')
+    if 'error' in jim_obj.keys():
+        print(f'Server error message: {jim_obj["error"]}')
+    if 'alert' in jim_obj.keys():
+        print(f'Server alert message: {jim_obj["alert"]}')
+
+
 def presence_send(sock_, account_name, status):
     jim_msg = {
         'action': 'presence',
@@ -42,11 +53,9 @@ def presence_send(sock_, account_name, status):
     try:
         data = sock.recv(1024)
         jim_obj = json.loads(data.decode('utf-8'))
-        print(jim_obj)
+        parse_answer(jim_obj)
     except json.JSONDecodeError:
-        print('Сервер прислал не JSON')
-    finally:
-        pass
+        print('JSON broken')
 
 
 try:

@@ -29,6 +29,20 @@ sock = socket(type=SOCK_STREAM)
 sock.bind(('', 9090))
 sock.listen(5)
 
+
+def make_answer(code, message={}):
+    answer_ = {'response': code}
+    if 'error' in message.keys():
+        answer_['error'] = message['error']
+    elif 'alert' in message.keys():
+        answer_['alert'] = message['alert']
+    return answer_
+
+
+def parse_presence():
+    print(111)
+
+
 while True:
     conn, addr = sock.accept()
 
@@ -42,13 +56,12 @@ while True:
                     break
                 jim_obj = json.loads(data.decode('utf-8'))
                 print(jim_obj)
-                conn.send(data.upper())
+                answer = make_answer(200)
+                answer = json.dumps(answer, separators=(',', ':'))
+                conn.send(answer.encode('utf-8'))
             except json.JSONDecodeError:
-                jim_answer = {
-                    'response': 400,
-                    'error': 'JSON broken'
-                }
-                answer = json.dumps(jim_answer, separators=(',', ':'))
+                answer = make_answer(400, {'error': 'JSON broken'})
+                answer = json.dumps(answer, separators=(',', ':'))
                 conn.send(answer.encode('utf-8'))
             except ConnectionResetError:
                 err_msg = 'Удаленный хост принудительно разорвал ' + \
