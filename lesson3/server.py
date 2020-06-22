@@ -22,12 +22,17 @@
 # -p <port> — TCP-порт для работы (по умолчанию использует 7777);
 # -a <addr> — IP-адрес для прослушивания
 # (по умолчанию слушает все доступные адреса).
+import argparse
 import json
+import sys
 from socket import SOCK_STREAM, socket
 
-sock = socket(type=SOCK_STREAM)
-sock.bind(('', 7777))
-sock.listen(5)
+
+def create_parser():
+    parser_ = argparse.ArgumentParser()
+    parser_.add_argument('-a', default='')
+    parser_.add_argument('-p', type=int, default=7777)
+    return parser_
 
 
 def make_answer(code, message={}):
@@ -56,6 +61,13 @@ def parse_presence(jim_obj_):
                   jim_obj_['user']['status'] + '"')
         return make_answer(200)
 
+
+parser = create_parser()
+namespace = parser.parse_args(sys.argv[1:])
+
+sock = socket(type=SOCK_STREAM)
+sock.bind((namespace.a, namespace.p))
+sock.listen(5)
 
 while True:
     conn, addr = sock.accept()

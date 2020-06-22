@@ -56,7 +56,7 @@ def presence_send(sock_, account_name, status):
         jim_obj = json.loads(data.decode('utf-8'))
         parse_answer(jim_obj)
     except json.JSONDecodeError:
-        print('JSON broken')
+        print('Answer JSON broken')
 
 
 try:
