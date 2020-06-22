@@ -39,8 +39,16 @@ def make_answer(code, message={}):
     return answer_
 
 
-def parse_presence():
-    print(111)
+def parse_presence(jim_obj_):
+    jim_msg = {
+        'action': 'presence',
+        'time': 'unixtimestamp',
+        'type': 'status',
+        'user': {
+            'account_name': '',
+            'status': '',
+        }
+    }
 
 
 while True:
@@ -56,7 +64,19 @@ while True:
                     break
                 jim_obj = json.loads(data.decode('utf-8'))
                 print(jim_obj)
-                answer = make_answer(200)
+                if 'action' not in jim_obj.keys():
+                    answer = make_answer(400,
+                                         {'error': 'Request has no "action"'})
+                elif 'time' not in jim_obj.keys():
+                    answer = make_answer(400,
+                                         {'error': 'Request has no "time""'})
+                else:
+                    if jim_obj['action'] == 'presence':
+                        answer = make_answer(200)
+                    else:
+                        answer = make_answer(400,
+                                             {'error': 'Unknown action'})
+
                 answer = json.dumps(answer, separators=(',', ':'))
                 conn.send(answer.encode('utf-8'))
             except json.JSONDecodeError:
