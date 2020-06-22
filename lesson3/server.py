@@ -40,15 +40,20 @@ def make_answer(code, message={}):
 
 
 def parse_presence(jim_obj_):
-    jim_msg = {
-        'action': 'presence',
-        'time': 'unixtimestamp',
-        'type': 'status',
-        'user': {
-            'account_name': '',
-            'status': '',
-        }
-    }
+    if 'user' not in jim_obj_.keys():
+        return make_answer(400, {'error': 'Request has no "user"'})
+    elif type(jim_obj_['user']) != dict:
+        return make_answer(400, {'error': '"user" is not dict'})
+    elif 'account_name' not in jim_obj_['user'].keys():
+        return make_answer(400, {'error': '"user" has no "account_name"'})
+    elif not jim_obj_['user']['account_name']:
+        return make_answer(400, {'error': '"account_name" is empty'})
+    else:
+        print(f'User {jim_obj_["user"]["account_name"]} is presence')
+        if jim_obj_['user']['status']:
+            print(f'Status user{jim_obj_["user"]["account_name"]} is "' +
+                  jim_obj_['user']['status'] + '"')
+        return make_answer(200)
 
 
 while True:
@@ -63,7 +68,6 @@ while True:
                 if not data:
                     break
                 jim_obj = json.loads(data.decode('utf-8'))
-                print(jim_obj)
                 if 'action' not in jim_obj.keys():
                     answer = make_answer(400,
                                          {'error': 'Request has no "action"'})
@@ -72,11 +76,10 @@ while True:
                                          {'error': 'Request has no "time""'})
                 else:
                     if jim_obj['action'] == 'presence':
-                        answer = make_answer(200)
+                        answer = parse_presence(jim_obj)
                     else:
                         answer = make_answer(400,
                                              {'error': 'Unknown action'})
-
                 answer = json.dumps(answer, separators=(',', ':'))
                 conn.send(answer.encode('utf-8'))
             except json.JSONDecodeError:
@@ -86,7 +89,6 @@ while True:
             except ConnectionResetError:
                 err_msg = 'Удаленный хост принудительно разорвал ' + \
                     'существующее подключение'
-                print(err_msg)
                 conn.close()
     finally:
         conn.close()
