@@ -23,6 +23,7 @@
 # -a <addr> — IP-адрес для прослушивания
 # (по умолчанию слушает все доступные адреса).
 import json
+import sys
 from datetime import datetime
 from socket import SOCK_STREAM, socket
 
@@ -59,8 +60,14 @@ def presence_send(sock_, account_name, status):
 
 
 try:
+    addr, port = 'localhost', 7777
+    if len(sys.argv) > 1:
+        addr = sys.argv[1]
+    if len(sys.argv) > 2:
+        port = int(sys.argv[2])
+
     sock = socket(type=SOCK_STREAM)
-    sock.connect(('localhost', 9090))
+    sock.connect((addr, port))
 
     presence_send(sock, 'C0deMaver1ck', 'Yep, I am here!')
 except ConnectionRefusedError:

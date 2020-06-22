@@ -26,7 +26,7 @@ import json
 from socket import SOCK_STREAM, socket
 
 sock = socket(type=SOCK_STREAM)
-sock.bind(('', 9090))
+sock.bind(('', 7777))
 sock.listen(5)
 
 
@@ -50,7 +50,8 @@ def parse_presence(jim_obj_):
         return make_answer(400, {'error': '"account_name" is empty'})
     else:
         print(f'User {jim_obj_["user"]["account_name"]} is presence')
-        if jim_obj_['user']['status']:
+        if 'status' in jim_obj_['user'].keys() \
+                and jim_obj_['user']['status']:
             print(f'Status user{jim_obj_["user"]["account_name"]} is "' +
                   jim_obj_['user']['status'] + '"')
         return make_answer(200)
