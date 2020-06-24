@@ -49,12 +49,12 @@ def choice_jim_action(jim_obj):
 
 
 def make_answer(code, message={}):
-    answer_ = {'response': code}
+    answer = {'response': code}
     if 'error' in message.keys():
-        answer_['error'] = message['error']
+        answer['error'] = message['error']
     elif 'alert' in message.keys():
-        answer_['alert'] = message['alert']
-    return answer_
+        answer['alert'] = message['alert']
+    return answer
 
 
 def parse_presence(jim_obj):

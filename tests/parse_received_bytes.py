@@ -6,9 +6,6 @@ from server import parse_received_bytes
 
 
 class TestSplitFunction(unittest.TestCase):
-    def setUp(self):
-        pass
-
     def test_parse_received_bytes_not_bytes(self):
         res = parse_received_bytes('test')
         self.assertEqual(res, NOT_BYTES)
