@@ -8,3 +8,10 @@ MAX_CONNECTIONS = 5
 MAX_PACKAGE_LENGTH = 1024
 # Кодировка проекта
 ENCODING = 'utf-8'
+
+# Ошибки разбора
+NOTBYTES = 'Arg is not bytes'
+NOACTION = 'Request has no "action"'
+NOTIME = 'Request has no "time""'
+BROKENJIM = 'JSON broken'
+UNKNOWNACTION = 'Unknown action'

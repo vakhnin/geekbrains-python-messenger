@@ -3,8 +3,9 @@ import json
 import sys
 from socket import SOCK_STREAM, socket
 
-from common.variables import (DEFAULT_PORT, ENCODING, MAX_CONNECTIONS,
-                              MAX_PACKAGE_LENGTH)
+from common.variables import (BROKENJIM, DEFAULT_PORT, ENCODING,
+                              MAX_CONNECTIONS, MAX_PACKAGE_LENGTH, NOACTION,
+                              NOTBYTES, NOTIME, UNKNOWNACTION)
 
 
 def make_listen_socket():
@@ -19,6 +20,32 @@ def make_listen_socket():
     return sock
 
 
+def parse_received_bytes(data):
+    if not isinstance(data, bytes):
+        return NOTBYTES
+    try:
+        jim_obj = json.loads(data.decode(ENCODING))
+        if 'action' not in jim_obj.keys():
+            return NOACTION
+        elif 'time' not in jim_obj.keys():
+            return NOTIME
+        return jim_obj
+    except json.JSONDecodeError:
+        return BROKENJIM
+
+
+def choice_jim_action(jim_obj):
+    if jim_obj == NOTBYTES:
+        return make_answer(500, {})
+    elif jim_obj in (NOACTION, NOTIME, BROKENJIM):
+        return make_answer(400, {'error': jim_obj})
+    else:
+        if jim_obj['action'] == 'presence':
+            return parse_presence(jim_obj)
+        else:
+            return make_answer(400, {'error': UNKNOWNACTION})
+
+
 def make_answer(code, message={}):
     answer_ = {'response': code}
     if 'error' in message.keys():
@@ -28,21 +55,21 @@ def make_answer(code, message={}):
     return answer_
 
 
-def parse_presence(jim_obj_):
-    if 'user' not in jim_obj_.keys():
+def parse_presence(jim_obj):
+    if 'user' not in jim_obj.keys():
         return make_answer(400, {'error': 'Request has no "user"'})
-    elif type(jim_obj_['user']) != dict:
+    elif type(jim_obj['user']) != dict:
         return make_answer(400, {'error': '"user" is not dict'})
-    elif 'account_name' not in jim_obj_['user'].keys():
+    elif 'account_name' not in jim_obj['user'].keys():
         return make_answer(400, {'error': '"user" has no "account_name"'})
-    elif not jim_obj_['user']['account_name']:
+    elif not jim_obj['user']['account_name']:
         return make_answer(400, {'error': '"account_name" is empty'})
     else:
-        print(f'User {jim_obj_["user"]["account_name"]} is presence')
-        if 'status' in jim_obj_['user'].keys() \
-                and jim_obj_['user']['status']:
-            print(f'Status user{jim_obj_["user"]["account_name"]} is "' +
-                  jim_obj_['user']['status'] + '"')
+        print(f'User {jim_obj["user"]["account_name"]} is presence')
+        if 'status' in jim_obj['user'].keys() \
+                and jim_obj['user']['status']:
+            print(f'Status user{jim_obj["user"]["account_name"]} is "' +
+                  jim_obj['user']['status'] + '"')
         return make_answer(200)
 
 
@@ -58,23 +85,8 @@ def main():
                     data = conn.recv(MAX_PACKAGE_LENGTH)
                     if not data:
                         break
-                    jim_obj = json.loads(data.decode(ENCODING))
-                    if 'action' not in jim_obj.keys():
-                        ans_str = 'Request has no "action"'
-                        answer = make_answer(400, {'error': ans_str})
-                    elif 'time' not in jim_obj.keys():
-                        ans_str = 'Request has no "time""'
-                        answer = make_answer(400, {'error': ans_str})
-                    else:
-                        if jim_obj['action'] == 'presence':
-                            answer = parse_presence(jim_obj)
-                        else:
-                            answer = make_answer(400,
-                                                 {'error': 'Unknown action'})
-                    answer = json.dumps(answer, separators=(',', ':'))
-                    conn.send(answer.encode(ENCODING))
-                except json.JSONDecodeError:
-                    answer = make_answer(400, {'error': 'JSON broken'})
+                    jim_obj = parse_received_bytes(data)
+                    answer = choice_jim_action(jim_obj)
                     answer = json.dumps(answer, separators=(',', ':'))
                     conn.send(answer.encode(ENCODING))
                 except ConnectionResetError:
