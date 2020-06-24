@@ -5,7 +5,7 @@ from socket import SOCK_STREAM, socket
 
 from common.variables import (BROKEN_JIM, DEFAULT_PORT, ENCODING,
                               MAX_CONNECTIONS, MAX_PACKAGE_LENGTH, NO_ACTION,
-                              NOT_BYTES, NO_TIME, UNKNOWN_ACTION)
+                              NO_TIME, NOT_BYTES, NOT_DICT, UNKNOWN_ACTION)
 
 
 def make_listen_socket():
@@ -25,7 +25,9 @@ def parse_received_bytes(data):
         return NOT_BYTES
     try:
         jim_obj = json.loads(data.decode(ENCODING))
-        if 'action' not in jim_obj.keys():
+        if not isinstance(jim_obj, dict):
+            return NOT_DICT
+        elif 'action' not in jim_obj.keys():
             return NO_ACTION
         elif 'time' not in jim_obj.keys():
             return NO_TIME

@@ -11,6 +11,7 @@ ENCODING = 'utf-8'
 
 # Ошибки разбора
 NOT_BYTES = 'Arg is not bytes'
+NOT_DICT = 'Dats is not dict'
 NO_ACTION = 'Request has no "action"'
 NO_TIME = 'Request has no "time""'
 BROKEN_JIM = 'JSON broken'
