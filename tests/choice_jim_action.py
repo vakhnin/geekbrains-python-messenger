@@ -1,6 +1,7 @@
 import unittest
 
-from common.variables import NOT_BYTES, NO_ACTION, NO_TIME, BROKEN_JIM, UNKNOWN_ACTION
+from common.variables import (BROKEN_JIM, NO_ACTION, NO_TIME, NOT_BYTES,
+                              UNKNOWN_ACTION)
 from server import choice_jim_action
 
 
