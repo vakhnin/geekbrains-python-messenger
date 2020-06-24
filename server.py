@@ -3,9 +3,9 @@ import json
 import sys
 from socket import SOCK_STREAM, socket
 
-from common.variables import (BROKENJIM, DEFAULT_PORT, ENCODING,
-                              MAX_CONNECTIONS, MAX_PACKAGE_LENGTH, NOACTION,
-                              NOTBYTES, NOTIME, UNKNOWNACTION)
+from common.variables import (BROKEN_JIM, DEFAULT_PORT, ENCODING,
+                              MAX_CONNECTIONS, MAX_PACKAGE_LENGTH, NO_ACTION,
+                              NOT_BYTES, NO_TIME, UNKNOWN_ACTION)
 
 
 def make_listen_socket():
@@ -22,28 +22,28 @@ def make_listen_socket():
 
 def parse_received_bytes(data):
     if not isinstance(data, bytes):
-        return NOTBYTES
+        return NOT_BYTES
     try:
         jim_obj = json.loads(data.decode(ENCODING))
         if 'action' not in jim_obj.keys():
-            return NOACTION
+            return NO_ACTION
         elif 'time' not in jim_obj.keys():
-            return NOTIME
+            return NO_TIME
         return jim_obj
     except json.JSONDecodeError:
-        return BROKENJIM
+        return BROKEN_JIM
 
 
 def choice_jim_action(jim_obj):
-    if jim_obj == NOTBYTES:
+    if jim_obj == NOT_BYTES:
         return make_answer(500, {})
-    elif jim_obj in (NOACTION, NOTIME, BROKENJIM):
+    elif jim_obj in (NO_ACTION, NO_TIME, BROKEN_JIM):
         return make_answer(400, {'error': jim_obj})
     else:
         if jim_obj['action'] == 'presence':
             return parse_presence(jim_obj)
         else:
-            return make_answer(400, {'error': UNKNOWNACTION})
+            return make_answer(400, {'error': UNKNOWN_ACTION})
 
 
 def make_answer(code, message={}):

@@ -10,8 +10,8 @@ MAX_PACKAGE_LENGTH = 1024
 ENCODING = 'utf-8'
 
 # Ошибки разбора
-NOTBYTES = 'Arg is not bytes'
-NOACTION = 'Request has no "action"'
-NOTIME = 'Request has no "time""'
-BROKENJIM = 'JSON broken'
-UNKNOWNACTION = 'Unknown action'
+NOT_BYTES = 'Arg is not bytes'
+NO_ACTION = 'Request has no "action"'
+NO_TIME = 'Request has no "time""'
+BROKEN_JIM = 'JSON broken'
+UNKNOWN_ACTION = 'Unknown action'
