@@ -3,8 +3,8 @@ import sys
 from datetime import datetime
 from socket import SOCK_STREAM, socket
 
-from lesson3.common.variables import (DEFAULT_IP_ADDRESS, DEFAULT_PORT,
-                                      ENCODING, MAX_PACKAGE_LENGTH)
+from common.variables import (DEFAULT_IP_ADDRESS, DEFAULT_PORT,
+                              ENCODING, MAX_PACKAGE_LENGTH)
 
 
 def parse_answer(jim_obj):
@@ -31,27 +31,32 @@ def presence_send(sock_, account_name, status):
     msg = json.dumps(jim_msg, separators=(',', ':'))
     sock_.send(msg.encode(ENCODING))
     try:
-        data = sock.recv(MAX_PACKAGE_LENGTH)
+        data = sock_.recv(MAX_PACKAGE_LENGTH)
         jim_obj = json.loads(data.decode(ENCODING))
         parse_answer(jim_obj)
     except json.JSONDecodeError:
         print('Answer JSON broken')
 
 
-try:
-    addr, port = DEFAULT_IP_ADDRESS, DEFAULT_PORT
-    if len(sys.argv) > 1:
-        addr = sys.argv[1]
-    if len(sys.argv) > 2:
-        port = int(sys.argv[2])
+def main():
+    try:
+        addr, port = DEFAULT_IP_ADDRESS, DEFAULT_PORT
+        if len(sys.argv) > 1:
+            addr = sys.argv[1]
+        if len(sys.argv) > 2:
+            port = int(sys.argv[2])
 
-    sock = socket(type=SOCK_STREAM)
-    sock.connect((addr, port))
+        sock = socket(type=SOCK_STREAM)
+        sock.connect((addr, port))
 
-    presence_send(sock, 'C0deMaver1ck', 'Yep, I am here!')
-except ConnectionRefusedError:
-    err_msg = 'Подключение не установлено, т.к. конечный компьютер ' + \
-            'отверг запрос на подключение'
-    print(err_msg)
-finally:
-    sock.close()
+        presence_send(sock, 'C0deMaver1ck', 'Yep, I am here!')
+    except ConnectionRefusedError:
+        err_msg = 'Подключение не установлено, т.к. конечный компьютер ' + \
+                'отверг запрос на подключение'
+        print(err_msg)
+    finally:
+        sock.close()
+
+
+if __name__ == '__main__':
+    main()
