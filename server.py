@@ -7,13 +7,6 @@ from common.variables import (DEFAULT_PORT, ENCODING, MAX_CONNECTIONS,
                               MAX_PACKAGE_LENGTH)
 
 
-def create_parser():
-    parser_ = argparse.ArgumentParser()
-    parser_.add_argument('-a', default='')
-    parser_.add_argument('-p', type=int, default=DEFAULT_PORT)
-    return parser_
-
-
 def make_listen_socket():
     parser = argparse.ArgumentParser()
     parser.add_argument('-a', default='')
