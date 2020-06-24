@@ -3,7 +3,7 @@ import unittest
 from server import parse_presence
 
 
-class TestSplitFunction(unittest.TestCase):
+class TestParsePresenceFunction(unittest.TestCase):
     def test_parse_presence_no_user(self):
         jim_obj = {'action': 'presence', 'time': 1593004547.839623,
                    'type': 'status',

@@ -5,7 +5,7 @@ from common.variables import (BROKEN_JIM, NO_ACTION, NO_TIME, NOT_BYTES,
 from server import choice_jim_action
 
 
-class TestSplitFunction(unittest.TestCase):
+class TestChoiceJimActionFunction(unittest.TestCase):
     def setUp(self):
         self.jim_obj = {'action': 'presence', 'time': 1593004547.839623,
                         'type': 'status',

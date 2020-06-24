@@ -5,7 +5,7 @@ from common.variables import (BROKEN_JIM, NO_ACTION, NO_TIME, NOT_BYTES,
 from server import parse_received_bytes
 
 
-class TestSplitFunction(unittest.TestCase):
+class TestparseReceivedBytesFunction(unittest.TestCase):
     def test_parse_received_bytes_not_bytes(self):
         res = parse_received_bytes('test')
         self.assertEqual(res, NOT_BYTES)

@@ -3,7 +3,7 @@ import unittest
 from server import make_answer
 
 
-class TestSplitFunction(unittest.TestCase):
+class TestMakeAnswerFunction(unittest.TestCase):
     def test_make_answer_code_only(self):
         res = make_answer(200)
         self.assertEqual(res, {'response': 200})
