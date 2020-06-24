@@ -3,7 +3,8 @@ import json
 import sys
 from socket import SOCK_STREAM, socket
 
-from common.variables import DEFAULT_PORT, ENCODING, MAX_PACKAGE_LENGTH
+from common.variables import (DEFAULT_PORT, ENCODING, MAX_CONNECTIONS,
+                              MAX_PACKAGE_LENGTH)
 
 
 def create_parser():
@@ -11,6 +12,18 @@ def create_parser():
     parser_.add_argument('-a', default='')
     parser_.add_argument('-p', type=int, default=DEFAULT_PORT)
     return parser_
+
+
+def make_listen_socket():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-a', default='')
+    parser.add_argument('-p', type=int, default=DEFAULT_PORT)
+    namespace = parser.parse_args(sys.argv[1:])
+
+    sock = socket(type=SOCK_STREAM)
+    sock.bind((namespace.a, namespace.p))
+    sock.listen(MAX_CONNECTIONS)
+    return sock
 
 
 def make_answer(code, message={}):
@@ -41,16 +54,9 @@ def parse_presence(jim_obj_):
 
 
 def main():
-    parser = create_parser()
-    namespace = parser.parse_args(sys.argv[1:])
-
-    sock = socket(type=SOCK_STREAM)
-    sock.bind((namespace.a, namespace.p))
-    sock.listen(5)
-
+    sock = make_listen_socket()
     while True:
         conn, addr = sock.accept()
-
         print(f'Соединение установлено: {addr}')
 
         try:

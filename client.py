@@ -3,8 +3,8 @@ import sys
 from datetime import datetime
 from socket import SOCK_STREAM, socket
 
-from common.variables import (DEFAULT_IP_ADDRESS, DEFAULT_PORT,
-                              ENCODING, MAX_PACKAGE_LENGTH)
+from common.variables import (DEFAULT_IP_ADDRESS, DEFAULT_PORT, ENCODING,
+                              MAX_PACKAGE_LENGTH)
 
 
 def parse_answer(jim_obj):
