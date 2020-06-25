@@ -31,7 +31,7 @@ def parse_answer(jim_obj):
         print(f'Server alert message: {jim_obj["alert"]}')
 
 
-def presence_send(sock_, account_name, status):
+def make_presence_message(account_name, status):
     jim_msg = {
         'action': 'presence',
         'time': datetime.now().timestamp(),
@@ -41,12 +41,15 @@ def presence_send(sock_, account_name, status):
             'status': status,
         }
     }
-    msg = json.dumps(jim_msg, separators=(',', ':'))
-    sock_.send(msg.encode(ENCODING))
+    return jim_msg
+
+
+def send_message_take_answer(sock, msg):
+    msg = json.dumps(msg, separators=(',', ':'))
     try:
-        data = sock_.recv(MAX_PACKAGE_LENGTH)
-        jim_obj = json.loads(data.decode(ENCODING))
-        parse_answer(jim_obj)
+        sock.send(msg.encode(ENCODING))
+        data = sock.recv(MAX_PACKAGE_LENGTH)
+        return json.loads(data.decode(ENCODING))
     except json.JSONDecodeError:
         print('Answer JSON broken')
 
@@ -55,7 +58,9 @@ def main():
     try:
         sock = make_sent_socket()
 
-        presence_send(sock, 'C0deMaver1ck', 'Yep, I am here!')
+        message = make_presence_message('C0deMaver1ck', 'Yep, I am here!')
+        answer = send_message_take_answer(sock, message)
+        parse_answer(answer)
 
         sock.close()
     except ConnectionRefusedError:
