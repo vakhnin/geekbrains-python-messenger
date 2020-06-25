@@ -32,7 +32,7 @@ def parse_answer(jim_obj):
 
 
 def make_presence_message(account_name, status):
-    jim_msg = {
+    return {
         'action': 'presence',
         'time': datetime.now().timestamp(),
         'type': 'status',
@@ -41,7 +41,6 @@ def make_presence_message(account_name, status):
             'status': status,
         }
     }
-    return jim_msg
 
 
 def send_message_take_answer(sock, msg):
