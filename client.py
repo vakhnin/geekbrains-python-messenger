@@ -7,6 +7,19 @@ from common.variables import (DEFAULT_IP_ADDRESS, DEFAULT_PORT, ENCODING,
                               MAX_PACKAGE_LENGTH)
 
 
+def make_sent_socket():
+    addr, port = DEFAULT_IP_ADDRESS, DEFAULT_PORT
+    if len(sys.argv) > 1:
+        addr = sys.argv[1]
+    if len(sys.argv) > 2:
+        port = int(sys.argv[2])
+
+    sock = socket(type=SOCK_STREAM)
+    sock.connect((addr, port))
+
+    return sock
+
+
 def parse_answer(jim_obj):
     if 'response' in jim_obj.keys():
         print(f'Server response: {jim_obj["response"]}')
@@ -40,22 +53,15 @@ def presence_send(sock_, account_name, status):
 
 def main():
     try:
-        addr, port = DEFAULT_IP_ADDRESS, DEFAULT_PORT
-        if len(sys.argv) > 1:
-            addr = sys.argv[1]
-        if len(sys.argv) > 2:
-            port = int(sys.argv[2])
-
-        sock = socket(type=SOCK_STREAM)
-        sock.connect((addr, port))
+        sock = make_sent_socket()
 
         presence_send(sock, 'C0deMaver1ck', 'Yep, I am here!')
+
+        sock.close()
     except ConnectionRefusedError:
         err_msg = 'Подключение не установлено, т.к. конечный компьютер ' + \
                 'отверг запрос на подключение'
         print(err_msg)
-    finally:
-        sock.close()
 
 
 if __name__ == '__main__':
