@@ -21,8 +21,11 @@ def make_sent_socket():
 
 
 def parse_answer(jim_obj):
+    if not isinstance(jim_obj, dict):
+        print('Server answer not dict')
+        return
     if 'response' in jim_obj.keys():
-        print(f'Server response: {jim_obj["response"]}')
+        print(f'Server answer: {jim_obj["response"]}')
     else:
         print('Answer has not "response" code')
     if 'error' in jim_obj.keys():
