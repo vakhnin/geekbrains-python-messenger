@@ -39,7 +39,3 @@ class TestChoiceJimActionFunction(unittest.TestCase):
         self.jim_obj['action'] = 'presence'
         res = choice_jim_action(self.jim_obj)
         self.assertEqual(res, {'response': 200})
-
-
-if __name__ == '__main__':
-    unittest.main()

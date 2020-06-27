@@ -13,7 +13,3 @@ class TestMakePresenceMessageFunction(unittest.TestCase):
         res = make_presence_message('test name', 'test status')
         data['time'] = res['time']
         self.assertEqual(res, data)
-
-
-if __name__ == '__main__':
-    unittest.main()

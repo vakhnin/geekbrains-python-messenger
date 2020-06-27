@@ -35,7 +35,3 @@ class TestParseAnswerFunction(unittest.TestCase):
         self.assertEqual(mock_stdout.getvalue(),
                          'Server answer: 400\n' +
                          'Server error message: error test\n')
-
-
-if __name__ == '__main__':
-    unittest.main()

@@ -29,7 +29,3 @@ class TestparseReceivedBytesFunction(unittest.TestCase):
     def test_parse_received_bytes_ok(self):
         res = parse_received_bytes(b'{"action":111,"time":222}')
         self.assertEqual(res, {'action': 111, 'time': 222})
-
-
-if __name__ == '__main__':
-    unittest.main()

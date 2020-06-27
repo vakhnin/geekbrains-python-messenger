@@ -15,7 +15,3 @@ class TestMakeAnswerFunction(unittest.TestCase):
     def test_make_answer_error(self):
         res = make_answer(400, {'error': 'code and error'})
         self.assertEqual(res, {'response': 400, 'error': 'code and error'})
-
-
-if __name__ == '__main__':
-    unittest.main()
