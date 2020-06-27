@@ -78,10 +78,9 @@ def parse_presence(jim_obj):
 def main():
     sock = make_listen_socket()
     while True:
-        conn, addr = sock.accept()
-        print(f'Соединение установлено: {addr}')
-
         try:
+            conn, addr = sock.accept()
+            print(f'Соединение установлено: {addr}')
             while True:
                 try:
                     data = conn.recv(MAX_PACKAGE_LENGTH)
@@ -96,8 +95,15 @@ def main():
                         'существующее подключение'
                     print(err_msg)
                     conn.close()
-        finally:
-            conn.close()
+                except Exception as e:
+                    print(f'Unknown error "{e}"')
+        except KeyboardInterrupt:
+            print('Canceled by keyboard')
+            exit(1)
+        except Exception as e:
+            print(f'Unknown error "{e}"')
+            exit(1)
+        conn.close()
 
 
 if __name__ == '__main__':

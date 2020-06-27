@@ -65,10 +65,22 @@ def main():
         parse_answer(answer)
 
         sock.close()
+    except KeyboardInterrupt:
+        print('Canceled by keyboard')
+        exit(1)
     except ConnectionRefusedError:
         err_msg = 'Подключение не установлено, т.к. конечный компьютер ' + \
                 'отверг запрос на подключение'
         print(err_msg)
+        exit(1)
+    except ConnectionResetError:
+        err_msg = 'Удаленный хост принудительно разорвал ' + \
+                  'существующее подключение'
+        print(err_msg)
+        sock.close()
+        exit(1)
+    except Exception as e:
+        print(f'Unknown error "{e}"')
 
 
 if __name__ == '__main__':
