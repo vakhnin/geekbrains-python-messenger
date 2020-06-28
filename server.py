@@ -6,6 +6,7 @@ from socket import SOCK_STREAM, socket
 from common.variables import (BROKEN_JIM, DEFAULT_PORT, ENCODING,
                               MAX_CONNECTIONS, MAX_PACKAGE_LENGTH, NO_ACTION,
                               NO_TIME, NOT_BYTES, NOT_DICT, UNKNOWN_ACTION)
+from log.server_log_config import LOG
 
 
 def make_listen_socket():
@@ -76,6 +77,7 @@ def parse_presence(jim_obj):
 
 
 def main():
+    LOG.debug('Старт приложения')
     sock = make_listen_socket()
     while True:
         try:
