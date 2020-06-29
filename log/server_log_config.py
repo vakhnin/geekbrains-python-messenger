@@ -1,17 +1,22 @@
 import logging
 import os
+from logging.handlers import TimedRotatingFileHandler
 
 LOG = logging.getLogger('messenger.server')
 
 FORMATTER = \
     logging.Formatter('%(asctime)s - %(levelname)s -  %(name)s - %(message)s ')
 
-logs_path = os.path.join(os.getcwd(), 'log', 'logs')
-if not os.path.exists(logs_path):
-    os.makedirs(logs_path)
-logs_path = os.path.join(logs_path, 'server.log')
-FILE_HANDLER = logging.FileHandler(logs_path, encoding='utf-8')
-FILE_HANDLER.setFormatter(FORMATTER)
+LOGS_PATH = os.path.join(os.getcwd(), 'log', 'logs')
+if not os.path.exists(LOGS_PATH):
+    os.makedirs(LOGS_PATH)
+LOGS_PATH = os.path.join(LOGS_PATH, 'server.log')
 
-LOG.addHandler(FILE_HANDLER)
+
+ROTATION_LOGGING_HANDLER = \
+    TimedRotatingFileHandler(
+        LOGS_PATH, when='D', interval=1, backupCount=5, encoding='utf-8')
+ROTATION_LOGGING_HANDLER.setFormatter(FORMATTER)
+LOG.addHandler(ROTATION_LOGGING_HANDLER)
+
 LOG.setLevel(logging.DEBUG)
