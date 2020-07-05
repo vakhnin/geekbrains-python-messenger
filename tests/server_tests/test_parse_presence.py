@@ -55,7 +55,3 @@ class TestParsePresenceFunction(unittest.TestCase):
                    }
         res = parse_presence(jim_obj)
         self.assertEqual(res, {'response': 200})
-
-
-if __name__ == '__main__':
-    unittest.main()

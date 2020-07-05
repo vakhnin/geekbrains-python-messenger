@@ -22,7 +22,3 @@ class TestMakeListenSocketFunction(unittest.TestCase):
         sock1.close()
         sock2.close()
         self.assertEqual(data, b'listen test')
-
-
-if __name__ == '__main__':
-    unittest.main()

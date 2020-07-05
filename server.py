@@ -6,8 +6,18 @@ from socket import SOCK_STREAM, socket
 from common.variables import (BROKEN_JIM, DEFAULT_PORT, ENCODING,
                               MAX_CONNECTIONS, MAX_PACKAGE_LENGTH, NO_ACTION,
                               NO_TIME, NOT_BYTES, NOT_DICT, UNKNOWN_ACTION)
+from log.server_log_config import LOG
 
 
+def log(func):
+    def wrap_log(*args, **kwargs):
+        LOG.debug(f'Вызов функции: {func.__name__} с аргументами :{args}')
+        return func(*args, **kwargs)
+
+    return wrap_log
+
+
+@log
 def make_listen_socket():
     parser = argparse.ArgumentParser()
     parser.add_argument('-a', default='')
@@ -20,6 +30,7 @@ def make_listen_socket():
     return sock
 
 
+@log
 def parse_received_bytes(data):
     if not isinstance(data, bytes):
         return NOT_BYTES
@@ -33,9 +44,11 @@ def parse_received_bytes(data):
             return NO_TIME
         return jim_obj
     except json.JSONDecodeError:
+        LOG.error(BROKEN_JIM)
         return BROKEN_JIM
 
 
+@log
 def choice_jim_action(jim_obj):
     if jim_obj == NOT_BYTES:
         return make_answer(500, {})
@@ -48,6 +61,7 @@ def choice_jim_action(jim_obj):
             return make_answer(400, {'error': UNKNOWN_ACTION})
 
 
+@log
 def make_answer(code, message={}):
     answer = {'response': code}
     if 'error' in message.keys():
@@ -57,6 +71,7 @@ def make_answer(code, message={}):
     return answer
 
 
+@log
 def parse_presence(jim_obj):
     if 'user' not in jim_obj.keys():
         return make_answer(400, {'error': 'Request has no "user"'})
@@ -76,12 +91,12 @@ def parse_presence(jim_obj):
 
 
 def main():
+    LOG.debug('Старт сервера')
     sock = make_listen_socket()
     while True:
-        conn, addr = sock.accept()
-        print(f'Соединение установлено: {addr}')
-
         try:
+            conn, addr = sock.accept()
+            print(f'Соединение установлено: {addr}')
             while True:
                 try:
                     data = conn.recv(MAX_PACKAGE_LENGTH)
@@ -94,10 +109,18 @@ def main():
                 except ConnectionResetError:
                     err_msg = 'Удаленный хост принудительно разорвал ' + \
                         'существующее подключение'
-                    print(err_msg)
+                    LOG.error(err_msg)
                     conn.close()
-        finally:
-            conn.close()
+                except Exception as e:
+                    LOG.error(f'Unknown error "{e}"')
+                    conn.close()
+        except KeyboardInterrupt:
+            LOG.debug('Canceled by keyboard')
+            exit(0)
+        except Exception as e:
+            LOG.error(f'Unknown error "{e}"')
+            exit(1)
+        conn.close()
 
 
 if __name__ == '__main__':
