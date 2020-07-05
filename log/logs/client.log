@@ -1,0 +1,5 @@
+2020-07-05 15:08:19,393 - DEBUG -  messenger.client - Старт клиента 
+2020-07-05 15:08:19,394 - DEBUG -  messenger.client - Log: make_sent_socket((),{}) = <socket.socket fd=208, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 55549), raddr=('127.0.0.1', 7777)> 
+2020-07-05 15:08:19,394 - DEBUG -  messenger.client - Log: make_presence_message(('C0deMaver1ck', 'Yep, I am here!'),{}) = {'action': 'presence', 'time': 1593950899.394927, 'type': 'status', 'user': {'account_name': 'C0deMaver1ck', 'status': 'Yep, I am here!'}} 
+2020-07-05 15:08:19,395 - DEBUG -  messenger.client - Log: send_message_take_answer((<socket.socket fd=208, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 55549), raddr=('127.0.0.1', 7777)>, {'action': 'presence', 'time': 1593950899.394927, 'type': 'status', 'user': {'account_name': 'C0deMaver1ck', 'status': 'Yep, I am here!'}}),{}) = {'response': 200} 
+2020-07-05 15:08:19,396 - DEBUG -  messenger.client - Log: parse_answer(({'response': 200},),{}) = None 
