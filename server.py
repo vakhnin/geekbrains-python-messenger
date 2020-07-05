@@ -9,15 +9,6 @@ from common.variables import (BROKEN_JIM, DEFAULT_PORT, ENCODING,
 from log.server_log_config import LOG
 
 
-def log(func):
-    def wrap_log(*args, **kwargs):
-        LOG.debug(f'Вызов функции: {func.__name__} с аргументами :{args}')
-        return func(*args, **kwargs)
-
-    return wrap_log
-
-
-@log
 def make_listen_socket():
     parser = argparse.ArgumentParser()
     parser.add_argument('-a', default='')
@@ -30,7 +21,6 @@ def make_listen_socket():
     return sock
 
 
-@log
 def parse_received_bytes(data):
     if not isinstance(data, bytes):
         return NOT_BYTES
@@ -48,7 +38,6 @@ def parse_received_bytes(data):
         return BROKEN_JIM
 
 
-@log
 def choice_jim_action(jim_obj):
     if jim_obj == NOT_BYTES:
         return make_answer(500, {})
@@ -61,7 +50,6 @@ def choice_jim_action(jim_obj):
             return make_answer(400, {'error': UNKNOWN_ACTION})
 
 
-@log
 def make_answer(code, message={}):
     answer = {'response': code}
     if 'error' in message.keys():
@@ -71,7 +59,6 @@ def make_answer(code, message={}):
     return answer
 
 
-@log
 def parse_presence(jim_obj):
     if 'user' not in jim_obj.keys():
         return make_answer(400, {'error': 'Request has no "user"'})
