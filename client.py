@@ -3,11 +3,13 @@ import sys
 from datetime import datetime
 from socket import SOCK_STREAM, socket
 
+from common.decorators import log
 from common.variables import (DEFAULT_IP_ADDRESS, DEFAULT_PORT, ENCODING,
                               MAX_PACKAGE_LENGTH)
 from log.client_log_config import LOG
 
 
+@log(LOG)
 def make_sent_socket():
     addr, port = DEFAULT_IP_ADDRESS, DEFAULT_PORT
     if len(sys.argv) > 1:
@@ -21,6 +23,7 @@ def make_sent_socket():
     return sock
 
 
+@log(LOG)
 def parse_answer(jim_obj):
     if not isinstance(jim_obj, dict):
         print('Server answer not dict')
@@ -35,6 +38,7 @@ def parse_answer(jim_obj):
         print(f'Server alert message: {jim_obj["alert"]}')
 
 
+@log(LOG)
 def make_presence_message(account_name, status):
     return {
         'action': 'presence',
@@ -47,6 +51,7 @@ def make_presence_message(account_name, status):
     }
 
 
+@log(LOG)
 def send_message_take_answer(sock, msg):
     msg = json.dumps(msg, separators=(',', ':'))
     try:
