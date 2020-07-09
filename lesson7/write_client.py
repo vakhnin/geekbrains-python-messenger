@@ -11,8 +11,6 @@ def echo_client():
             if msg == 'exit':
                 break
             sock.send(msg.encode('utf-8'))
-            data = sock.recv(1024).decode('utf-8')
-            print('Ответ:', data)
 
 
 if __name__ == '__main__':
