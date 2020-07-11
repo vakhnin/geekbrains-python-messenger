@@ -85,6 +85,7 @@ def parse_presence(jim_obj):
         return make_answer(200)
 
 
+@log(LOG)
 def read_requests(r_clients, all_clients):
     responses = {}
 
@@ -99,6 +100,7 @@ def read_requests(r_clients, all_clients):
     return responses
 
 
+@log(LOG)
 def write_responses(responses, w_clients, all_clients):
     for _, resp in responses.items():
         for sock in w_clients:
