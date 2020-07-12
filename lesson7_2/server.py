@@ -2,6 +2,7 @@ import argparse
 import json
 import select
 import sys
+from collections import deque
 from socket import SOCK_STREAM, socket
 
 from common.decorators import log
@@ -86,39 +87,48 @@ def parse_presence(jim_obj):
 
 
 @log(LOG)
-def read_requests(r_clients, all_clients):
-    responses = {}
-
+def read_requests(r_clients, clients_data):
     for sock in r_clients:
+        if sock not in clients_data.keys():
+            return
         try:
-            data = sock.recv(MAX_PACKAGE_LENGTH).decode('utf-8')
-            responses[sock] = data
+            msg = sock.recv(MAX_PACKAGE_LENGTH).decode('utf-8')
+            answer = make_answer(200)
+            answer = json.dumps(answer, separators=(',', ':'))
+            clients_data[sock]['answ_for_send'].append(answer)
+            for key, value in clients_data.items():
+                value['msg_for_send'].append(msg)
         except Exception:
             print(f'Клиент {sock.fileno()} {sock.getpeername()} отключился')
-            all_clients.remove(sock)
-
-    return responses
+            sock.close()
+            del clients_data[sock]
 
 
 @log(LOG)
-def write_responses(responses, w_clients, all_clients):
-    for _, resp in responses.items():
-        for sock in w_clients:
-            try:
-                sock.send(resp.encode('utf-8'))
-            except Exception:
-                print(
-                    f'Клиент {sock.fileno()} {sock.getpeername()} отключился'
-                )
-                sock.close()
-                all_clients.remove(sock)
+def write_responses(w_clients, clients_data):
+    for sock in w_clients:
+        if sock not in clients_data.keys():
+            return
+        try:
+            if len(clients_data[sock]['answ_for_send']):
+                msg = clients_data[sock]['answ_for_send'].pop()
+                sock.send(msg.encode('utf-8'))
+            elif len(clients_data[sock]['msg_for_send']):
+                msg = clients_data[sock]['msg_for_send'].pop()
+                sock.send(msg.encode('utf-8'))
+        except Exception:
+            print(
+                f'Клиент {sock.fileno()} {sock.getpeername()} отключился'
+            )
+            sock.close()
+            del clients_data[sock]
 
 
 def main():
     LOG.debug('Старт сервера')
     print('Старт сервера')
 
-    clients = []
+    clients_data = {}
     sock = make_listen_socket()
     while True:
         try:
@@ -128,21 +138,26 @@ def main():
             pass
         else:
             print('Получен запрос на соединение от %s' % str(addr))
-            clients.append(conn)
+            clients_data[conn] = \
+                {
+                    'name': '',
+                    'msg_for_send': deque(maxlen=100),
+                    'answ_for_send': deque(maxlen=100),
+                }
         finally:
             wait = 0
             r = []
             w = []
             try:
-                r, w, e = select.select(clients, clients, [], wait)
+                r, w, e = \
+                    select.select(
+                        clients_data.keys(), clients_data.keys(), [], wait)
                 LOG.debug(f'Ошибки сокетов {e}')
             except Exception:
                 pass
 
-            responses = read_requests(r, clients)
-            if responses != {}:
-                print(responses)
-            write_responses(responses, w, clients)
+            read_requests(r, clients_data)
+            write_responses(w, clients_data)
 
 
 if __name__ == '__main__':
