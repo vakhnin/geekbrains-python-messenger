@@ -5,14 +5,15 @@ from lesson7_2.common_client import (make_msg_message, parse_args,
 
 
 def main():
-    addr, port = parse_args()
+    address, port, account_name = parse_args()
+    print(f'Привет, {account_name}!')
     with socket(AF_INET, SOCK_STREAM) as sock:
-        sock.connect((addr, port))
+        sock.connect((address, port))
         while True:
             msg = input('Ваше сообщение: ')
             if msg == 'exit':
                 break
-            msg = make_msg_message('Guest', msg)
+            msg = make_msg_message(account_name, msg)
             send_message_take_answer(sock, msg)
 
 

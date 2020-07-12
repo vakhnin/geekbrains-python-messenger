@@ -6,7 +6,7 @@ from lesson7_2.server import parse_received_bytes
 
 
 def main():
-    address, port = parse_args()
+    address, port, account_name = parse_args()
     with socket(AF_INET, SOCK_STREAM) as sock:
         sock.connect((address, port))
         while True:

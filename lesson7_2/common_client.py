@@ -1,26 +1,22 @@
+import argparse
 import json
 import sys
 import time
-from socket import SOCK_STREAM, socket
 
 from common.decorators import log
-from common.variables import (DEFAULT_IP_ADDRESS, DEFAULT_PORT, ENCODING,
-                              MAX_PACKAGE_LENGTH)
+from common.variables import DEFAULT_PORT, ENCODING, MAX_PACKAGE_LENGTH
 from log.client_log_config import LOG
 
 
 @log(LOG)
 def parse_args():
-    addr, port = DEFAULT_IP_ADDRESS, DEFAULT_PORT
-    if len(sys.argv) > 1:
-        addr = sys.argv[1]
-    if len(sys.argv) > 2:
-        port = int(sys.argv[2])
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-a', default='localhost')
+    parser.add_argument('-n', default='Guest')
+    parser.add_argument('-p', type=int, default=DEFAULT_PORT)
+    namespace = parser.parse_args(sys.argv[1:])
 
-    sock = socket(type=SOCK_STREAM)
-    sock.connect((addr, port))
-
-    return addr, port
+    return namespace.a, namespace.p, namespace.n
 
 
 @log(LOG)
