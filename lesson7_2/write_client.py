@@ -1,17 +1,20 @@
 from socket import AF_INET, SOCK_STREAM, socket
 
-ADDRESS = ('localhost', 7777)
+from lesson7_2.common_client import (make_msg_message, parse_args,
+                                     send_message_take_answer)
 
 
-def echo_client():
+def main():
+    addr, port = parse_args()
     with socket(AF_INET, SOCK_STREAM) as sock:
-        sock.connect(ADDRESS)
+        sock.connect((addr, port))
         while True:
             msg = input('Ваше сообщение: ')
             if msg == 'exit':
                 break
-            sock.send(msg.encode('utf-8'))
+            msg = make_msg_message('Guest', msg)
+            send_message_take_answer(sock, msg)
 
 
 if __name__ == '__main__':
-    echo_client()
+    main()

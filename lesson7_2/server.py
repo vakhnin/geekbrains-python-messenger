@@ -143,34 +143,6 @@ def main():
             if responses != {}:
                 print(responses)
             write_responses(responses, w, clients)
-    # while True:
-    #     try:
-    #         conn, addr = sock.accept()
-    #         print(f'Соединение установлено: {addr}')
-    #         while True:
-    #             try:
-    #                 data = conn.recv(MAX_PACKAGE_LENGTH)
-    #                 if not data:
-    #                     break
-    #                 jim_obj = parse_received_bytes(data)
-    #                 answer = choice_jim_action(jim_obj)
-    #                 answer = json.dumps(answer, separators=(',', ':'))
-    #                 conn.send(answer.encode(ENCODING))
-    #             except ConnectionResetError:
-    #                 err_msg = 'Удаленный хост принудительно разорвал ' + \
-    #                     'существующее подключение'
-    #                 LOG.error(err_msg)
-    #                 conn.close()
-    #             except Exception as e:
-    #                 LOG.error(f'Unknown error "{e}"')
-    #                 conn.close()
-    #     except KeyboardInterrupt:
-    #         LOG.debug('Canceled by keyboard')
-    #         exit(0)
-    #     except Exception as e:
-    #         LOG.error(f'Unknown error "{e}"')
-    #         exit(1)
-    #     conn.close()
 
 
 if __name__ == '__main__':

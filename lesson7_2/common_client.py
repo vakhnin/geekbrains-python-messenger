@@ -1,6 +1,6 @@
 import json
 import sys
-from datetime import datetime
+import time
 from socket import SOCK_STREAM, socket
 
 from common.decorators import log
@@ -42,12 +42,24 @@ def parse_answer(jim_obj):
 def make_presence_message(account_name, status):
     return {
         'action': 'presence',
-        'time': datetime.now().timestamp(),
+        'time':  time.time(),
         'type': 'status',
         'user': {
             'account_name': account_name,
             'status': status,
         }
+    }
+
+
+@log(LOG)
+def make_msg_message(account_name, msg, to='#'):
+    return {
+        'action': 'msg',
+        'time': time.time(),
+        'to': to,
+        'from': account_name,
+        'encoding': 'utf-8',
+        'message': msg,
     }
 
 

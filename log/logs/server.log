@@ -1,6 +1,2 @@
-2020-07-05 15:08:16,377 - DEBUG -  messenger.server - Старт сервера 
-2020-07-05 15:08:16,379 - DEBUG -  messenger.server - Log: make_listen_socket((),{}) = <socket.socket fd=612, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('0.0.0.0', 7777)> 
-2020-07-05 15:08:19,395 - DEBUG -  messenger.server - Log: parse_received_bytes((b'{"action":"presence","time":1593950899.394927,"type":"status","user":{"account_name":"C0deMaver1ck","status":"Yep, I am here!"}}',),{}) = {'action': 'presence', 'time': 1593950899.394927, 'type': 'status', 'user': {'account_name': 'C0deMaver1ck', 'status': 'Yep, I am here!'}} 
-2020-07-05 15:08:19,395 - DEBUG -  messenger.server - Log: make_answer((200,),{}) = {'response': 200} 
-2020-07-05 15:08:19,395 - DEBUG -  messenger.server - Log: parse_presence(({'action': 'presence', 'time': 1593950899.394927, 'type': 'status', 'user': {'account_name': 'C0deMaver1ck', 'status': 'Yep, I am here!'}},),{}) = {'response': 200} 
-2020-07-05 15:08:19,395 - DEBUG -  messenger.server - Log: choice_jim_action(({'action': 'presence', 'time': 1593950899.394927, 'type': 'status', 'user': {'account_name': 'C0deMaver1ck', 'status': 'Yep, I am here!'}},),{}) = {'response': 200} 
+2020-07-12 14:18:17,305 - DEBUG -  messenger.server - Старт сервера 
+2020-07-12 14:18:17,308 - DEBUG -  messenger.server - Log: make_listen_socket((),{}) = <socket.socket fd=644, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('0.0.0.0', 7777)> 
