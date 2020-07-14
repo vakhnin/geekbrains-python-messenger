@@ -18,22 +18,22 @@ while True:
         )
 
         PROCESSES.append(
-            subprocess.Popen('python write_client.py -n test1',
+            subprocess.Popen('python client.py -n test1',
                              creationflags=subprocess.CREATE_NEW_CONSOLE)
         )
         PROCESSES.append(
-            subprocess.Popen('python write_client.py -n test2',
+            subprocess.Popen('python client.py -n test2',
                              creationflags=subprocess.CREATE_NEW_CONSOLE)
         )
-        PROCESSES.append(
-            subprocess.Popen('python write_client.py -n test3',
-                             creationflags=subprocess.CREATE_NEW_CONSOLE)
-        )
-
-        PROCESSES.append(
-            subprocess.Popen('python read_client.py',
-                             creationflags=subprocess.CREATE_NEW_CONSOLE)
-        )
+        # PROCESSES.append(
+        #     subprocess.Popen('python client.py -n test3',
+        #                      creationflags=subprocess.CREATE_NEW_CONSOLE)
+        # )
+        #
+        # PROCESSES.append(
+        #     subprocess.Popen('python read_client.py',
+        #                      creationflags=subprocess.CREATE_NEW_CONSOLE)
+        # )
         PROCESSES.append(
             subprocess.Popen('python read_client.py',
                              creationflags=subprocess.CREATE_NEW_CONSOLE)
