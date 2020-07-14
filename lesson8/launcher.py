@@ -17,31 +17,11 @@ while True:
                              creationflags=subprocess.CREATE_NEW_CONSOLE)
         )
 
-        PROCESSES.append(
-            subprocess.Popen('python client.py -n test1',
-                             creationflags=subprocess.CREATE_NEW_CONSOLE)
-        )
-        PROCESSES.append(
-            subprocess.Popen('python client.py -n test2',
-                             creationflags=subprocess.CREATE_NEW_CONSOLE)
-        )
-        # PROCESSES.append(
-        #     subprocess.Popen('python client.py -n test3',
-        #                      creationflags=subprocess.CREATE_NEW_CONSOLE)
-        # )
-        #
-        # PROCESSES.append(
-        #     subprocess.Popen('python read_client.py',
-        #                      creationflags=subprocess.CREATE_NEW_CONSOLE)
-        # )
-        PROCESSES.append(
-            subprocess.Popen('python read_client.py',
-                             creationflags=subprocess.CREATE_NEW_CONSOLE)
-        )
-        PROCESSES.append(
-            subprocess.Popen('python read_client.py',
-                             creationflags=subprocess.CREATE_NEW_CONSOLE)
-        )
+        for i in range(3):
+            PROCESSES.append(
+                subprocess.Popen(f'python client.py -n test{i}',
+                                 creationflags=subprocess.CREATE_NEW_CONSOLE)
+            )
     elif ACTION == 'x':
         while PROCESSES:
             VICTIM = PROCESSES.pop()
