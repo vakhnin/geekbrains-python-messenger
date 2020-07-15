@@ -7,7 +7,6 @@ from socket import AF_INET, SOCK_STREAM, socket
 
 from common.decorators import log
 from common.variables import DEFAULT_PORT, ENCODING, MAX_PACKAGE_LENGTH
-from lesson8.server import parse_received_bytes
 from log.client_log_config import LOG
 
 
@@ -76,22 +75,45 @@ def send_message_take_answer(sock, msg):
 
 @log(LOG)
 def user_input(sock, client_name):
-    while True:
-        msg = input('Ваше сообщение: ')
-        if msg == 'exit':
-            break
-        msg = make_msg_message(client_name, msg)
-        send_message_take_answer(sock, msg)
+    try:
+        while True:
+            msg = input('Ваше сообщение: \n')
+            if msg == 'exit':
+                break
+            msg = make_msg_message(client_name, msg)
+            msg = json.dumps(msg, separators=(',', ':'))
+            sock.send(msg.encode(ENCODING))
+    except Exception as e:
+        LOG.debug(f'Ошибка выходного потока {e}')
 
 
 @log(LOG)
 def user_output(sock, client_name):
-    while True:
-        data = sock.recv(MAX_PACKAGE_LENGTH)
-        if not data:
-            break
-        jim_obj = parse_received_bytes(data)
-        print(f'{jim_obj["from"]}> {jim_obj["message"]}')
+    try:
+        while True:
+            data = sock.recv(MAX_PACKAGE_LENGTH)
+            if not data:
+                break
+            try:
+                jim_obj = json.loads(data.decode(ENCODING))
+            except json.JSONDecodeError:
+                LOG.error(f'Brocken jim {data}')
+                continue
+            if not isinstance(jim_obj, dict):
+                LOG.error(f'Data not dict {jim_obj}')
+                continue
+            if 'response' in jim_obj.keys():
+                LOG.debug(f'Получен ответ сервера {jim_obj["response"]}')
+                continue
+            if 'action' in jim_obj.keys():
+                if jim_obj['action'] == 'msg':
+                    if 'from' in jim_obj.keys() and\
+                            'message' in jim_obj.keys():
+                        print(
+                            f'{jim_obj["from"]}> {jim_obj["message"]}'
+                        )
+    except Exception as e:
+        LOG.debug(f'Ошибка входного потока{e}')
 
 
 def main():
