@@ -113,10 +113,12 @@ def read_requests(r_clients, clients_data):
                             and 'client_name' in jim_obj['user'].keys():
                         clients_data[sock]['client_name'] = \
                             jim_obj['user']['client_name']
-                        print(clients_data)
                         continue
-            for key, value in clients_data.items():
-                value['msg_for_send'].append(msg)
+                elif jim_obj['action'] == 'msg':
+                    for _, value in clients_data.items():
+                        if jim_obj['to'] == '#' \
+                                or jim_obj['to'] == value['client_name']:
+                            value['msg_for_send'].append(msg)
         except Exception:
             print(f'Клиент {sock.fileno()} {sock.getpeername()} отключился')
             sock.close()

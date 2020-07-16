@@ -77,10 +77,19 @@ def send_message_take_answer(sock, msg):
 def user_input(sock, client_name):
     try:
         while True:
-            msg = input('Ваше сообщение: \n')
-            if msg == 'exit':
+            msg = input('Введите команду: \n')
+            msg = msg.split(' ')
+            if msg[0] == 'exit':
                 break
-            msg = make_msg_message(client_name, msg)
+            elif msg[0] == 'm':
+                msg = make_msg_message(client_name, ' '.join(msg[1:]))
+            elif msg[0] == 'p':
+                msg = make_msg_message(client_name, ' '.join(msg[2:]), msg[1])
+            else:
+                print('Команда не распознана. '
+                      'Введите "help" для вывода списка команд')
+                continue
+
             msg = json.dumps(msg, separators=(',', ':'))
             sock.send(msg.encode(ENCODING))
     except Exception as e:
@@ -107,11 +116,18 @@ def user_output(sock, client_name):
                 continue
             if 'action' in jim_obj.keys():
                 if jim_obj['action'] == 'msg':
-                    if 'from' in jim_obj.keys() and\
-                            'message' in jim_obj.keys():
-                        print(
-                            f'{jim_obj["from"]}> {jim_obj["message"]}'
-                        )
+                    if 'from' in jim_obj.keys() \
+                            and 'message' in jim_obj.keys():
+                        if 'to' in jim_obj.keys() \
+                                and jim_obj['to'] == '#':
+                            print(
+                                f'{jim_obj["from"]}> {jim_obj["message"]}'
+                            )
+                        else:
+                            print(
+                                f'{jim_obj["from"]} (private)> '
+                                f'{jim_obj["message"]}'
+                            )
     except Exception as e:
         LOG.debug(f'Ошибка входного потока{e}')
 
