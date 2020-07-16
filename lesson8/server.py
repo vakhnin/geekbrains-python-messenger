@@ -93,9 +93,28 @@ def read_requests(r_clients, clients_data):
             return
         try:
             msg = sock.recv(MAX_PACKAGE_LENGTH).decode('utf-8')
+            try:
+                jim_obj = json.loads(msg)
+            except json.JSONDecodeError:
+                LOG.error(f'Brocken jim {msg}')
+                continue
+
             answer = make_answer(200)
             answer = json.dumps(answer, separators=(',', ':'))
             clients_data[sock]['answ_for_send'].append(answer)
+
+            if not isinstance(jim_obj, dict):
+                LOG.error(f'Data not dict {jim_obj}')
+                continue
+            if 'action' in jim_obj.keys():
+                if jim_obj['action'] == 'presence':
+                    if 'user' in jim_obj.keys() \
+                            and isinstance(jim_obj['user'], dict) \
+                            and 'client_name' in jim_obj['user'].keys():
+                        clients_data[sock]['client_name'] = \
+                            jim_obj['user']['client_name']
+                        print(clients_data)
+                        continue
             for key, value in clients_data.items():
                 value['msg_for_send'].append(msg)
         except Exception:
@@ -140,7 +159,7 @@ def main():
             print('Получен запрос на соединение от %s' % str(addr))
             clients_data[conn] = \
                 {
-                    'name': '',
+                    'client_name': '',
                     'msg_for_send': deque(maxlen=100),
                     'answ_for_send': deque(maxlen=100),
                 }
