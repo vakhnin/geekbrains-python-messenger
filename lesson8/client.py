@@ -1,5 +1,6 @@
 import argparse
 import json
+import re
 import sys
 import threading
 import time
@@ -74,16 +75,38 @@ def send_message_take_answer(sock, msg):
 
 
 @log(LOG)
+def cmd_help():
+    print('Поддерживаемые команды:')
+    print('m [сообщение] - отправить сообщение в общий чат.')
+    print('p [получатель] [сообщение] - отправить приватное сообщение.')
+    print('help - вывести подсказки по командам')
+    print('exit - выход из программы')
+
+
+@log(LOG)
 def user_input(sock, client_name):
     try:
+        cmd_help()
         while True:
             msg = input('Введите команду: \n')
-            msg = msg.split(' ')
+            msg = msg.strip()
+            msg = re.split('\\s+', msg)
             if msg[0] == 'exit':
                 break
+            elif msg[0] == 'help':
+                cmd_help()
+                continue
             elif msg[0] == 'm':
+                if len(msg) < 2:
+                    print('Неверное количество аргументов команды.'
+                          'Введите "help" для вывода списка команд')
+                    continue
                 msg = make_msg_message(client_name, ' '.join(msg[1:]))
             elif msg[0] == 'p':
+                if len(msg) < 3:
+                    print('Неверное количество аргументов команды.'
+                          'Введите "help" для вывода списка команд')
+                    continue
                 msg = make_msg_message(client_name, ' '.join(msg[2:]), msg[1])
             else:
                 print('Команда не распознана. '
@@ -141,11 +164,14 @@ def main():
         sock.connect((address, port))
         message = make_presence_message(client_name, 'I am here!')
         answer = send_message_take_answer(sock, message)
+        message = json.dumps(message, separators=(',', ':'))
+        sock.send(message.encode(ENCODING))
+        print('Установлено соединение с сервером.')
         LOG.info(
             f'Запущен клиент с парамертами: адрес сервера: {address}, '
             f'порт: {port}, имя пользователя: {client_name}')
         LOG.info(f'Установлено соединение с сервером. Ответ сервера: {answer}')
-        print(f'Привет {client_name}!')
+        print(f'\nПривет {client_name}!\n')
     except Exception as e:
         print('Соединение с сервером не установлено.')
         LOG.error(f'Соединение с сервером не установлено. Ошибка {e}')
