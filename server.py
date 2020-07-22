@@ -1,6 +1,8 @@
 import argparse
 import json
+import select
 import sys
+from collections import deque
 from socket import SOCK_STREAM, socket
 
 from common.decorators import log
@@ -20,6 +22,7 @@ def make_listen_socket():
     sock = socket(type=SOCK_STREAM)
     sock.bind((namespace.a, namespace.p))
     sock.listen(MAX_CONNECTIONS)
+    sock.settimeout(0.2)
     return sock
 
 
@@ -83,37 +86,99 @@ def parse_presence(jim_obj):
         return make_answer(200)
 
 
+@log(LOG)
+def read_requests(r_clients, clients_data):
+    for sock in r_clients:
+        if sock not in clients_data.keys():
+            return
+        try:
+            msg = sock.recv(MAX_PACKAGE_LENGTH).decode('utf-8')
+            try:
+                jim_obj = json.loads(msg)
+            except json.JSONDecodeError:
+                LOG.error(f'Brocken jim {msg}')
+                continue
+
+            answer = make_answer(200)
+            answer = json.dumps(answer, separators=(',', ':'))
+            clients_data[sock]['answ_for_send'].append(answer)
+
+            if not isinstance(jim_obj, dict):
+                LOG.error(f'Data not dict {jim_obj}')
+                continue
+            if 'action' in jim_obj.keys():
+                if jim_obj['action'] == 'presence':
+                    if 'user' in jim_obj.keys() \
+                            and isinstance(jim_obj['user'], dict) \
+                            and 'client_name' in jim_obj['user'].keys():
+                        clients_data[sock]['client_name'] = \
+                            jim_obj['user']['client_name']
+                        continue
+                elif jim_obj['action'] == 'msg':
+                    for _, value in clients_data.items():
+                        if jim_obj['to'] == '#' \
+                                or jim_obj['to'] == value['client_name']:
+                            value['msg_for_send'].append(msg)
+        except Exception:
+            print(f'Клиент {sock.fileno()} {sock.getpeername()} отключился')
+            sock.close()
+            del clients_data[sock]
+
+
+@log(LOG)
+def write_responses(w_clients, clients_data):
+    for sock in w_clients:
+        if sock not in clients_data.keys():
+            return
+        try:
+            if len(clients_data[sock]['answ_for_send']):
+                msg = clients_data[sock]['answ_for_send'].pop()
+                sock.send(msg.encode('utf-8'))
+            elif len(clients_data[sock]['msg_for_send']):
+                msg = clients_data[sock]['msg_for_send'].pop()
+                sock.send(msg.encode('utf-8'))
+        except Exception:
+            print(
+                f'Клиент {sock.fileno()} {sock.getpeername()} отключился'
+            )
+            sock.close()
+            del clients_data[sock]
+
+
 def main():
     LOG.debug('Старт сервера')
+    print('Старт сервера')
+
+    clients_data = {}
     sock = make_listen_socket()
     while True:
         try:
             conn, addr = sock.accept()
             print(f'Соединение установлено: {addr}')
-            while True:
-                try:
-                    data = conn.recv(MAX_PACKAGE_LENGTH)
-                    if not data:
-                        break
-                    jim_obj = parse_received_bytes(data)
-                    answer = choice_jim_action(jim_obj)
-                    answer = json.dumps(answer, separators=(',', ':'))
-                    conn.send(answer.encode(ENCODING))
-                except ConnectionResetError:
-                    err_msg = 'Удаленный хост принудительно разорвал ' + \
-                        'существующее подключение'
-                    LOG.error(err_msg)
-                    conn.close()
-                except Exception as e:
-                    LOG.error(f'Unknown error "{e}"')
-                    conn.close()
-        except KeyboardInterrupt:
-            LOG.debug('Canceled by keyboard')
-            exit(0)
-        except Exception as e:
-            LOG.error(f'Unknown error "{e}"')
-            exit(1)
-        conn.close()
+        except OSError:
+            pass
+        else:
+            print('Получен запрос на соединение от %s' % str(addr))
+            clients_data[conn] = \
+                {
+                    'client_name': '',
+                    'msg_for_send': deque(maxlen=100),
+                    'answ_for_send': deque(maxlen=100),
+                }
+        finally:
+            wait = 0
+            r = []
+            w = []
+            try:
+                r, w, e = \
+                    select.select(
+                        clients_data.keys(), clients_data.keys(), [], wait)
+                LOG.debug(f'Ошибки сокетов {e}')
+            except Exception:
+                pass
+
+            read_requests(r, clients_data)
+            write_responses(w, clients_data)
 
 
 if __name__ == '__main__':
