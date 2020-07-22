@@ -1,2 +1,0 @@
-2020-07-12 14:18:17,305 - DEBUG -  messenger.server - Старт сервера 
-2020-07-12 14:18:17,308 - DEBUG -  messenger.server - Log: make_listen_socket((),{}) = <socket.socket fd=644, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('0.0.0.0', 7777)> 
