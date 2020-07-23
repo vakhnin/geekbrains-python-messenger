@@ -5,14 +5,22 @@ import sys
 from collections import deque
 from socket import SOCK_STREAM, socket
 
-from common.decorators import log
 from common.variables import (BROKEN_JIM, DEFAULT_PORT, ENCODING,
                               MAX_CONNECTIONS, MAX_PACKAGE_LENGTH, NO_ACTION,
                               NO_TIME, NOT_BYTES, NOT_DICT, UNKNOWN_ACTION)
 from log.server_log_config import LOG
 
 
-@log(LOG)
+def log(func):
+    def wrap_log(*args, **kwargs):
+        res = func(*args, **kwargs)
+        LOG.debug(f'Log: {func.__name__}({args},{kwargs}) = {res}')
+        return res
+
+    return wrap_log
+
+
+@log
 def make_listen_socket():
     parser = argparse.ArgumentParser()
     parser.add_argument('-a', default='')
@@ -26,7 +34,7 @@ def make_listen_socket():
     return sock
 
 
-@log(LOG)
+@log
 def parse_received_bytes(data):
     if not isinstance(data, bytes):
         return NOT_BYTES
@@ -44,7 +52,7 @@ def parse_received_bytes(data):
         return BROKEN_JIM
 
 
-@log(LOG)
+@log
 def choice_jim_action(jim_obj):
     if jim_obj == NOT_BYTES:
         return make_answer(500, {})
@@ -57,7 +65,7 @@ def choice_jim_action(jim_obj):
             return make_answer(400, {'error': UNKNOWN_ACTION})
 
 
-@log(LOG)
+@log
 def make_answer(code, message={}):
     answer = {'response': code}
     if 'error' in message.keys():
@@ -67,7 +75,7 @@ def make_answer(code, message={}):
     return answer
 
 
-@log(LOG)
+@log
 def parse_presence(jim_obj):
     if 'user' not in jim_obj.keys():
         return make_answer(400, {'error': 'Request has no "user"'})
@@ -86,7 +94,7 @@ def parse_presence(jim_obj):
         return make_answer(200)
 
 
-@log(LOG)
+@log
 def read_requests(r_clients, clients_data):
     for sock in r_clients:
         if sock not in clients_data.keys():
@@ -125,7 +133,7 @@ def read_requests(r_clients, clients_data):
             del clients_data[sock]
 
 
-@log(LOG)
+@log
 def write_responses(w_clients, clients_data):
     for sock in w_clients:
         if sock not in clients_data.keys():

@@ -6,12 +6,20 @@ import threading
 import time
 from socket import AF_INET, SOCK_STREAM, socket
 
-from common.decorators import log
 from common.variables import DEFAULT_PORT, ENCODING, MAX_PACKAGE_LENGTH
 from log.client_log_config import LOG
 
 
-@log(LOG)
+def log(func):
+    def wrap_log(*args, **kwargs):
+        res = func(*args, **kwargs)
+        LOG.debug(f'Log: {func.__name__}({args},{kwargs}) = {res}')
+        return res
+
+    return wrap_log
+
+
+@log
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-a', default='localhost')
@@ -22,7 +30,7 @@ def parse_args():
     return namespace.a, namespace.p, namespace.n
 
 
-@log(LOG)
+@log
 def parse_answer(jim_obj):
     if not isinstance(jim_obj, dict):
         print('Server answer not dict')
@@ -37,7 +45,7 @@ def parse_answer(jim_obj):
         print(f'Server alert message: {jim_obj["alert"]}')
 
 
-@log(LOG)
+@log
 def make_presence_message(client_name, status):
     return {
         'action': 'presence',
@@ -50,7 +58,7 @@ def make_presence_message(client_name, status):
     }
 
 
-@log(LOG)
+@log
 def make_msg_message(client_name, msg, to='#'):
     return {
         'action': 'msg',
@@ -62,7 +70,7 @@ def make_msg_message(client_name, msg, to='#'):
     }
 
 
-@log(LOG)
+@log
 def send_message_take_answer(sock, msg):
     msg = json.dumps(msg, separators=(',', ':'))
     try:
@@ -74,7 +82,7 @@ def send_message_take_answer(sock, msg):
         return {}
 
 
-@log(LOG)
+@log
 def cmd_help():
     print('Поддерживаемые команды:')
     print('m [сообщение] - отправить сообщение в общий чат.')
@@ -83,7 +91,7 @@ def cmd_help():
     print('exit - выход из программы')
 
 
-@log(LOG)
+@log
 def user_input(sock, client_name):
     try:
         cmd_help()
@@ -119,7 +127,7 @@ def user_input(sock, client_name):
         LOG.debug(f'Ошибка выходного потока {e}')
 
 
-@log(LOG)
+@log
 def user_output(sock, client_name):
     try:
         while True:
